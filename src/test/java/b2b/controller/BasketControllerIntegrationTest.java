@@ -17,6 +17,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
+import static b2b.model.BasketStatus.DELETED;
 import static b2b.model.BasketStatus.PENDING;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
@@ -156,17 +157,38 @@ public class BasketControllerIntegrationTest {
     }
 
     @Test
+    public void shouldDeleteBasket() throws Exception {
+        Basket basket = new Basket("1", PENDING, Sets.newHashSet());
+
+        mongoOps.insert(basket);
+
+        MvcResult result = mockMvc.perform(delete("/basket/{id}", basket.getId()))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        Basket resultBasket = objectMapper.readValue(result.getResponse().getContentAsString(), Basket.class);
+        assertThat(resultBasket, is(basket));
+
+        Basket persistentBasket = mongoOps.findById(basket.getId(), Basket.class);
+        assertThat(persistentBasket.getStatus(), is(DELETED));
+        assertThat(persistentBasket.getLastModifiedDate(), greaterThan(basket.getLastModifiedDate()));
+    }
+
+    @Test
     public void shouldReturn404ForNonExistentBasket() throws Exception {
         // get basket
         mockMvc.perform(get("/basket/{id}", "i-am-not-in-the-db"))
                 .andExpect(status().isNotFound());
-
 
         // update product
         Product product = new Product("1", 1);
         String json = objectMapper.writeValueAsString(product);
         mockMvc.perform(put("/basket/{id}/product", "i-am-not-in-the-db")
                 .contentType(MediaType.APPLICATION_JSON).content(json))
+                .andExpect(status().isNotFound());
+
+        // delete basket
+        mockMvc.perform(delete("/basket/{id}", "i-am-not-in-the-db"))
                 .andExpect(status().isNotFound());
     }
 

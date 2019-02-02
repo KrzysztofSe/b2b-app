@@ -61,6 +61,13 @@ public class CustomBasketRepositoryImpl implements CustomBasketRepository {
         return Optional.ofNullable(mongoOperations.findAndModify(q, u, OPTIONS, Basket.class));
     }
 
+    @Override
+    public Optional<Basket> setStatus(String basketId, BasketStatus status) {
+        Query q = query(withIdPending(basketId));
+        Update u = update().set(STATUS, status);
+        return Optional.ofNullable(mongoOperations.findAndModify(q, u, OPTIONS, Basket.class));
+    }
+
     private static Criteria withIdAndStatus(String id, BasketStatus status) {
         return where(ID).is(id).and(STATUS).is(status);
     }

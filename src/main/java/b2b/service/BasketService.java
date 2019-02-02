@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import java.util.Optional;
 import java.util.function.Supplier;
 
+import static b2b.model.BasketStatus.DELETED;
 import static b2b.model.BasketStatus.PENDING;
 
 @Service
@@ -46,7 +47,13 @@ public class BasketService {
                 .orElseGet(() -> execute(() -> basketRepository.updateProduct(basketId, product), basketId));
     }
 
+    public Basket deleteBasket(String basketId) {
+        return execute(() -> basketRepository.setStatus(basketId, DELETED), basketId);
+    }
+
     private Basket execute(Supplier<Optional<Basket>> function, String id) {
         return function.get().orElseThrow(() -> new BasketNotFoundException("No active basket found with id " + id));
     }
+
+
 }
