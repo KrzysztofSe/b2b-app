@@ -3,7 +3,10 @@ package b2b.service;
 import b2b.exception.BasketNotFoundException;
 import b2b.model.Basket;
 import b2b.model.BasketStatus;
+import b2b.model.Product;
 import b2b.repository.BasketRepository;
+import org.assertj.core.util.Lists;
+import org.assertj.core.util.Sets;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -34,8 +37,7 @@ public class BasketServiceTest {
 
     @Test
     public void shouldCreateNewBasket() {
-        Basket basket = new Basket();
-        basket.setId("1");
+        Basket basket = new Basket("1", PENDING, Sets.newHashSet());
 
         when(basketRepository.insert(any(Basket.class))).thenReturn(basket);
 
@@ -49,8 +51,7 @@ public class BasketServiceTest {
 
     @Test
     public void shouldGetActiveBasket() {
-        Basket basket = new Basket();
-        basket.setId("1");
+        Basket basket = new Basket("1", PENDING, Sets.newHashSet());
 
         when(basketRepository.findByIdAndStatus(basket.getId(), PENDING)).thenReturn(Optional.of(basket));
 
@@ -64,18 +65,95 @@ public class BasketServiceTest {
 
     @Test
     public void shouldThrowExceptionWhenBasketNotFound() {
-        String id = "1";
+        String basketId = "1";
 
-        when(basketRepository.findByIdAndStatus(id, PENDING)).thenReturn(Optional.empty());
+        when(basketRepository.findByIdAndStatus(basketId, PENDING)).thenReturn(Optional.empty());
 
         expectedException.expect(BasketNotFoundException.class);
-        expectedException.expectMessage("No active basket found with id " + id);
-        basketService.getActiveBasket(id);
+        expectedException.expectMessage("No active basket found with id " + basketId);
+        basketService.getActiveBasket(basketId);
 
-        verify(basketRepository, times(1)).findByIdAndStatus(id, PENDING);
+        verify(basketRepository, times(1)).findByIdAndStatus(basketId, PENDING);
         verifyNoMoreInteractions(basketRepository);
     }
 
+    @Test
+    public void shouldRemoveProductWhenGivenQuantityIs0() {
+        Basket expectedBasket = new Basket("1", PENDING, Sets.newHashSet());
+        Product product = new Product("1", 0);
 
+        when(basketRepository.removeProduct(expectedBasket.getId(), product)).thenReturn(Optional.of(expectedBasket));
+
+        Basket result = basketService.updateProductInBasket(expectedBasket.getId(), product);
+
+        assertThat(result, is(expectedBasket));
+
+        verify(basketRepository, times(1)).removeProduct(expectedBasket.getId(), product);
+        verifyNoMoreInteractions(basketRepository);
+    }
+
+    @Test
+    public void shouldThrowExceptionWhenTryingToRemoveProductFromNonExistentBasket() {
+        String basketId = "1";
+        Product product = new Product("1", 0);
+
+        when(basketRepository.removeProduct(basketId, product)).thenReturn(Optional.empty());
+
+        expectedException.expect(BasketNotFoundException.class);
+        expectedException.expectMessage("No active basket found with id " + basketId);
+        basketService.updateProductInBasket(basketId, product);
+
+        verify(basketRepository, times(1)).removeProduct(basketId, product);
+        verifyNoMoreInteractions(basketRepository);
+    }
+
+    @Test
+    public void shouldInsertProductToBasket() {
+        Product product = new Product("1", 1);
+        Basket expectedBasket = new Basket("1", PENDING, Sets.newHashSet(Lists.newArrayList(product)));
+
+        when(basketRepository.insertProduct(expectedBasket.getId(), product)).thenReturn(Optional.of(expectedBasket));
+
+        Basket result = basketService.updateProductInBasket(expectedBasket.getId(), product);
+
+        assertThat(result, is(expectedBasket));
+
+        verify(basketRepository, times(1)).insertProduct(expectedBasket.getId(), product);
+        verifyNoMoreInteractions(basketRepository);
+    }
+
+    @Test
+    public void shouldUpdateProductInBasket() {
+        Product product = new Product("1", 1);
+        Basket expectedBasket = new Basket("1", PENDING, Sets.newHashSet(Lists.newArrayList(product)));
+
+        when(basketRepository.insertProduct(expectedBasket.getId(), product)).thenReturn(Optional.empty());
+        when(basketRepository.updateProduct(expectedBasket.getId(), product)).thenReturn(Optional.of(expectedBasket));
+
+        Basket result = basketService.updateProductInBasket(expectedBasket.getId(), product);
+
+        assertThat(result, is(expectedBasket));
+
+        verify(basketRepository, times(1)).insertProduct(expectedBasket.getId(), product);
+        verify(basketRepository, times(1)).updateProduct(expectedBasket.getId(), product);
+        verifyNoMoreInteractions(basketRepository);
+    }
+
+    @Test
+    public void shouldThrowExceptionWhenTryingToEditProductInNonExistentBasket() {
+        String basketId = "1";
+        Product product = new Product("1", 1);
+
+        when(basketRepository.insertProduct(basketId, product)).thenReturn(Optional.empty());
+        when(basketRepository.updateProduct(basketId, product)).thenReturn(Optional.empty());
+
+        expectedException.expect(BasketNotFoundException.class);
+        expectedException.expectMessage("No active basket found with id " + basketId);
+        basketService.updateProductInBasket(basketId, product);
+
+        verify(basketRepository, times(1)).insertProduct(basketId, product);
+        verify(basketRepository, times(1)).updateProduct(basketId, product);
+        verifyNoMoreInteractions(basketRepository);
+    }
 
 }

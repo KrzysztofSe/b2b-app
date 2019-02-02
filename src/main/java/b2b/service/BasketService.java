@@ -2,6 +2,7 @@ package b2b.service;
 
 import b2b.exception.BasketNotFoundException;
 import b2b.model.Basket;
+import b2b.model.Product;
 import b2b.repository.BasketRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,6 +34,16 @@ public class BasketService {
     public Basket getActiveBasket(String basketId) {
         LOG.info("Getting active basket with id {}", basketId);
         return execute(() -> basketRepository.findByIdAndStatus(basketId, PENDING), basketId);
+    }
+
+    public Basket updateProductInBasket(String basketId, Product product) {
+        if (product.getQuantity() == 0) {
+            LOG.info("Removing {} from basket with id {}", product, basketId);
+            return execute(() -> basketRepository.removeProduct(basketId, product), basketId);
+        }
+        LOG.info("Updating {} in basket with id {}", product, basketId);
+        return basketRepository.insertProduct(basketId, product)
+                .orElseGet(() -> execute(() -> basketRepository.updateProduct(basketId, product), basketId));
     }
 
     private Basket execute(Supplier<Optional<Basket>> function, String id) {

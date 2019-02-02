@@ -15,6 +15,11 @@ public class Product {
 
     public Product() {}
 
+    public Product(String id, Integer quantity) {
+        this.id = id;
+        this.quantity = quantity;
+    }
+
     public String getId() {
         return id;
     }
