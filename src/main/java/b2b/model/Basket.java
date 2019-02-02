@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
@@ -16,6 +17,9 @@ public class Basket {
 
     @JsonIgnore
     private BasketStatus status = BasketStatus.PENDING;
+
+    @JsonIgnore
+    private LocalDateTime lastModifiedDate = LocalDateTime.now();
 
     private Set<Product> products = new HashSet<>();
 
@@ -37,6 +41,14 @@ public class Basket {
         this.status = status;
     }
 
+    public LocalDateTime getLastModifiedDate() {
+        return lastModifiedDate;
+    }
+
+    public void setLastModifiedDate(LocalDateTime lastModifiedDate) {
+        this.lastModifiedDate = lastModifiedDate;
+    }
+
     public Set<Product> getProducts() {
         return products;
     }
@@ -56,5 +68,15 @@ public class Basket {
     @Override
     public int hashCode() {
         return Objects.hash(id);
+    }
+
+    @Override
+    public String toString() {
+        return "Basket{" +
+                "id='" + id + '\'' +
+                ", status=" + status +
+                ", lastModifiedDate=" + lastModifiedDate +
+                ", products=" + products +
+                '}';
     }
 }
