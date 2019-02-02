@@ -13,6 +13,7 @@ import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 import static b2b.model.BasketStatus.*;
@@ -222,6 +223,38 @@ public class BasketRepositoryIntegrationTest {
         assertThat(updatedBasket, is(basketWithProducts));
         assertThat(updatedBasket.getStatus(), is(ORDERED));
         assertThat(updatedBasket.getLastModifiedDate(), greaterThan(basketWithProducts.getLastModifiedDate()));
+    }
+
+    @Test
+    public void shouldSetStatusForOldBaskets() {
+        LocalDateTime threshold = LocalDateTime.now().minusMinutes(30);
+
+        Basket basket = new Basket("1", PENDING, Sets.newHashSet());
+
+        Basket oldBasket = new Basket("2", PENDING, Sets.newHashSet());
+        oldBasket.setLastModifiedDate(LocalDateTime.now().minusMinutes(60));
+
+        Basket basketInWrongState = new Basket("3", DELETED, Sets.newHashSet());
+        basketInWrongState.setLastModifiedDate(LocalDateTime.now().minusDays(10));
+
+        mongoOps.insert(basket);
+        mongoOps.insert(oldBasket);
+        mongoOps.insert(basketInWrongState);
+
+        long count = basketRepository.setStatusForOlderThan(threshold, EXPIRED);
+        assertThat(count, is(1L));
+
+        Basket basketAfter = mongoOps.findById(basket.getId(), Basket.class);
+        assertThat(basketAfter.getStatus(), is(basket.getStatus()));
+        assertThat(basketAfter.getLastModifiedDate(), is(basket.getLastModifiedDate()));
+
+        Basket oldBasketAfter = mongoOps.findById(oldBasket.getId(), Basket.class);
+        assertThat(oldBasketAfter.getStatus(), is(EXPIRED));
+        assertThat(oldBasketAfter.getLastModifiedDate(), greaterThan(oldBasket.getLastModifiedDate()));
+
+        Basket basketInWrongStateAfter = mongoOps.findById(basketInWrongState.getId(), Basket.class);
+        assertThat(basketInWrongStateAfter.getStatus(), is(basketInWrongState.getStatus()));
+        assertThat(basketInWrongStateAfter.getLastModifiedDate(), is(basketInWrongState.getLastModifiedDate()));
     }
 
 }

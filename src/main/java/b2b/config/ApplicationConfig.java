@@ -6,11 +6,13 @@ import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.mongodb.core.MongoClientFactoryBean;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.web.client.RestTemplate;
 
 import static org.springframework.util.StringUtils.isEmpty;
 
 @Configuration
+@EnableScheduling
 public class ApplicationConfig {
 
     private final String mongoHost;

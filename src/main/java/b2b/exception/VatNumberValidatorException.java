@@ -13,4 +13,5 @@ public class VatNumberValidatorException extends CustomRestException {
     public VatNumberValidatorException(String message, Throwable cause) {
         super(message, cause);
     }
+
 }

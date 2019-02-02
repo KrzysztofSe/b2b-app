@@ -11,6 +11,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 import static b2b.model.BasketStatus.PENDING;
@@ -75,6 +76,13 @@ public class CustomBasketRepositoryImpl implements CustomBasketRepository {
         return Optional.ofNullable(mongoOperations.findAndModify(q, u, OPTIONS, Basket.class));
     }
 
+    @Override
+    public long setStatusForOlderThan(LocalDateTime date, BasketStatus status) {
+        Query q = query(where(STATUS).is(PENDING).and(LAST_MODIFIED_DATE).lt(date));
+        Update u = update().set(STATUS, status);
+        return mongoOperations.updateMulti(q, u, Basket.class).getModifiedCount();
+    }
+
     private static Criteria withIdAndStatus(String id, BasketStatus status) {
         return where(ID).is(id).and(STATUS).is(status);
     }
@@ -86,4 +94,5 @@ public class CustomBasketRepositoryImpl implements CustomBasketRepository {
     private static Update update() {
         return new Update().currentDate(LAST_MODIFIED_DATE);
     }
+
 }

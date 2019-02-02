@@ -3,7 +3,6 @@ package b2b.service;
 import b2b.exception.BasketNotFoundException;
 import b2b.exception.InvalidBasketException;
 import b2b.model.Basket;
-import b2b.model.BasketStatus;
 import b2b.model.Product;
 import b2b.repository.BasketRepository;
 import org.assertj.core.util.Lists;
@@ -18,9 +17,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.Optional;
 
-import static b2b.model.BasketStatus.DELETED;
-import static b2b.model.BasketStatus.ORDERED;
-import static b2b.model.BasketStatus.PENDING;
+import static b2b.model.BasketStatus.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;

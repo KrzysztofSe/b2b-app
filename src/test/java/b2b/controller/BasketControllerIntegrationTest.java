@@ -9,6 +9,7 @@ import org.assertj.core.util.Sets;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentMatchers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -24,14 +25,11 @@ import org.springframework.web.client.RestTemplate;
 
 import java.net.URI;
 
-import static b2b.model.BasketStatus.DELETED;
-import static b2b.model.BasketStatus.ORDERED;
-import static b2b.model.BasketStatus.PENDING;
+import static b2b.model.BasketStatus.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.mockito.Mockito.when;
-import org.mockito.ArgumentMatchers;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
