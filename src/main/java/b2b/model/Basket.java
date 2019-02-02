@@ -1,5 +1,6 @@
 package b2b.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -13,6 +14,9 @@ public class Basket {
     @Id
     private String id;
 
+    @JsonIgnore
+    private BasketStatus status = BasketStatus.PENDING;
+
     private Set<Product> products = new HashSet<>();
 
     public Basket() {}
@@ -23,6 +27,14 @@ public class Basket {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public BasketStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(BasketStatus status) {
+        this.status = status;
     }
 
     public Set<Product> getProducts() {
