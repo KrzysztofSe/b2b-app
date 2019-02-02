@@ -25,6 +25,12 @@ public class Basket {
 
     public Basket() {}
 
+    public Basket(String id, BasketStatus status, Set<Product> products) {
+        this.id = id;
+        this.status = status;
+        this.products = products;
+    }
+
     public String getId() {
         return id;
     }
