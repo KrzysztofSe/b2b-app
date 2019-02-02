@@ -11,4 +11,9 @@ public class CustomRestException extends RuntimeException {
         super(message);
         LOG.warn(message);
     }
+
+    public CustomRestException(String message, Throwable cause) {
+        super(message, cause);
+        LOG.warn(message);
+    }
 }

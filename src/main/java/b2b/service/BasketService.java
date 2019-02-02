@@ -1,6 +1,7 @@
 package b2b.service;
 
 import b2b.exception.BasketNotFoundException;
+import b2b.exception.InvalidBasketException;
 import b2b.model.Basket;
 import b2b.model.Product;
 import b2b.repository.BasketRepository;
@@ -13,6 +14,7 @@ import java.util.Optional;
 import java.util.function.Supplier;
 
 import static b2b.model.BasketStatus.DELETED;
+import static b2b.model.BasketStatus.ORDERED;
 import static b2b.model.BasketStatus.PENDING;
 
 @Service
@@ -48,12 +50,22 @@ public class BasketService {
     }
 
     public Basket deleteBasket(String basketId) {
+        LOG.info("Deleting basket with id {}", basketId);
         return execute(() -> basketRepository.setStatus(basketId, DELETED), basketId);
+    }
+
+    public Basket orderBasket(String basketId) {
+        LOG.info("Ordering basket with id {}", basketId);
+        Optional<Basket> opt = basketRepository.setStatusForBasketWithProducts(basketId, ORDERED);
+        if (opt.isPresent()) {
+            return opt.get();
+        }
+        execute(() -> basketRepository.findByIdAndStatus(basketId, PENDING), basketId);
+        throw new InvalidBasketException("Basket with id " + basketId + " has no products");
     }
 
     private Basket execute(Supplier<Optional<Basket>> function, String id) {
         return function.get().orElseThrow(() -> new BasketNotFoundException("No active basket found with id " + id));
     }
-
 
 }
