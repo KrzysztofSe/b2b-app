@@ -15,6 +15,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.Optional;
 
+import static b2b.model.BasketStatus.DELETED;
 import static b2b.model.BasketStatus.EXPIRED;
 import static b2b.model.BasketStatus.PENDING;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -155,14 +156,40 @@ public class BasketRepositoryIntegrationTest {
         assertThat(result2.isPresent(), is(false));
 
         // should remove
-        Optional<Basket> result4 = basketRepository.removeProduct(basket.getId(), product);
-        assertThat(result4.isPresent(), is(true));
+        Optional<Basket> result3 = basketRepository.removeProduct(basket.getId(), product);
+        assertThat(result3.isPresent(), is(true));
 
-        Basket updatedBasket = result4.get();
+        Basket updatedBasket = result3.get();
         assertThat(updatedBasket, is(basket));
         assertThat(updatedBasket.getStatus(), is(basket.getStatus()));
         assertThat(updatedBasket.getLastModifiedDate(), greaterThan(basket.getLastModifiedDate()));
         assertThat(updatedBasket.getProducts(), not(hasItem(product)));
+    }
+
+    @Test
+    public void shouldSetStatus() {
+        Basket basket = new Basket("1", PENDING, Sets.newHashSet());
+        Basket expiredBasket = new Basket("2", EXPIRED, Sets.newHashSet());
+
+        mongoOps.insert(basket);
+        mongoOps.insert(expiredBasket);
+
+        // should not set status - wrong basket id
+        Optional<Basket> result1 = basketRepository.setStatus("xxx", DELETED);
+        assertThat(result1.isPresent(), is(false));
+
+        // should not set status - basket expired
+        Optional<Basket> result2 = basketRepository.setStatus(expiredBasket.getId(), DELETED);
+        assertThat(result2.isPresent(), is(false));
+
+        // should set status
+        Optional<Basket> result3 = basketRepository.setStatus(basket.getId(), DELETED);
+        assertThat(result3.isPresent(), is(true));
+
+        Basket updatedBasket = result3.get();
+        assertThat(updatedBasket, is(basket));
+        assertThat(updatedBasket.getStatus(), is(DELETED));
+        assertThat(updatedBasket.getLastModifiedDate(), greaterThan(basket.getLastModifiedDate()));
     }
 
 }

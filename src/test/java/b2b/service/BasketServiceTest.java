@@ -17,6 +17,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.Optional;
 
+import static b2b.model.BasketStatus.DELETED;
 import static b2b.model.BasketStatus.PENDING;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -153,6 +154,34 @@ public class BasketServiceTest {
 
         verify(basketRepository, times(1)).insertProduct(basketId, product);
         verify(basketRepository, times(1)).updateProduct(basketId, product);
+        verifyNoMoreInteractions(basketRepository);
+    }
+
+    @Test
+    public void shouldDeleteBasket() {
+        Basket expectedBasket = new Basket("1", DELETED, Sets.newHashSet());
+
+        when(basketRepository.setStatus(expectedBasket.getId(), DELETED)).thenReturn(Optional.of(expectedBasket));
+
+        Basket result = basketService.deleteBasket(expectedBasket.getId());
+
+        assertThat(result, is(expectedBasket));
+
+        verify(basketRepository, times(1)).setStatus(expectedBasket.getId(), DELETED);
+        verifyNoMoreInteractions(basketRepository);
+    }
+
+    @Test
+    public void shouldThrowExceptionWhenTryingToDeleteNonExistentBasket() {
+        String basketId = "1";
+
+        when(basketRepository.setStatus(basketId, DELETED)).thenReturn(Optional.empty());
+
+        expectedException.expect(BasketNotFoundException.class);
+        expectedException.expectMessage("No active basket found with id " + basketId);
+        basketService.deleteBasket(basketId);
+
+        verify(basketRepository, times(1)).setStatus(basketId, DELETED);
         verifyNoMoreInteractions(basketRepository);
     }
 

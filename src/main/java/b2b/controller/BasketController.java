@@ -43,4 +43,9 @@ public class BasketController {
         return basketService.updateProductInBasket(id, product);
     }
 
+    @RequestMapping(path = "/{id}", method = RequestMethod.DELETE)
+    public Basket deleteBasket(@PathVariable String id) {
+        return basketService.deleteBasket(id);
+    }
+
 }
