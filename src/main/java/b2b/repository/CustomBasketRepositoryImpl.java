@@ -3,7 +3,6 @@ package b2b.repository;
 import b2b.model.Basket;
 import b2b.model.BasketStatus;
 import b2b.model.Product;
-import com.mongodb.client.result.UpdateResult;
 import org.bson.Document;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.FindAndModifyOptions;
@@ -95,4 +94,5 @@ public class CustomBasketRepositoryImpl implements CustomBasketRepository {
     private static Update update() {
         return new Update().currentDate(LAST_MODIFIED_DATE);
     }
+
 }

@@ -14,7 +14,6 @@ import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Optional;
 
 import static b2b.model.BasketStatus.*;

@@ -56,4 +56,5 @@ public class Product {
                 ", quantity=" + quantity +
                 '}';
     }
+
 }
