@@ -2,9 +2,11 @@ package b2b.config;
 
 import com.mongodb.MongoCredential;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.mongodb.core.MongoClientFactoryBean;
+import org.springframework.web.client.RestTemplate;
 
 import static org.springframework.util.StringUtils.isEmpty;
 
@@ -25,6 +27,11 @@ public class ApplicationConfig {
         this.mongoUser = mongoUser;
         this.mongoPassword = mongoPassword;
         this.mongoDatabase = mongoDatabase;
+    }
+
+    @Bean
+    public RestTemplate restTemplate(RestTemplateBuilder builder) {
+        return builder.build();
     }
 
     @Bean

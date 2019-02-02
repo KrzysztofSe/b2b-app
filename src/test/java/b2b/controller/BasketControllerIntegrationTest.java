@@ -2,6 +2,7 @@ package b2b.controller;
 
 import b2b.model.Basket;
 import b2b.model.Product;
+import b2b.model.VatNumberResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.assertj.core.util.Lists;
 import org.assertj.core.util.Sets;
@@ -11,17 +12,26 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.mongodb.core.MongoOperations;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.web.client.RestTemplate;
+
+import java.net.URI;
 
 import static b2b.model.BasketStatus.DELETED;
+import static b2b.model.BasketStatus.ORDERED;
 import static b2b.model.BasketStatus.PENDING;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.hamcrest.core.IsEqual.equalTo;
+import static org.mockito.Mockito.when;
+import org.mockito.ArgumentMatchers;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -38,6 +48,9 @@ public class BasketControllerIntegrationTest {
 
     @Autowired
     private ObjectMapper objectMapper;
+
+    @MockBean
+    private RestTemplate restTemplate;
 
     @Before
     public void before() {
@@ -175,7 +188,55 @@ public class BasketControllerIntegrationTest {
     }
 
     @Test
+    public void shouldThrowExceptionWhenVatNumberInvalid() throws Exception {
+        VatNumberResponse body = new VatNumberResponse();
+        body.setValid(false);
+        ResponseEntity<VatNumberResponse> response = new ResponseEntity<>(body, HttpStatus.OK);
+        when(restTemplate.getForEntity(ArgumentMatchers.any(URI.class), ArgumentMatchers.eq(VatNumberResponse.class)))
+                .thenReturn(response);
+
+        Basket basket = new Basket("1", PENDING, Sets.newHashSet());
+
+        mongoOps.insert(basket);
+
+        mockMvc.perform(post("/basket/{id}/order?vatNumber={vat}", basket.getId(), "12345"))
+                .andExpect(status().isPreconditionFailed());
+    }
+
+    @Test
+    public void shouldOrderBasket() throws Exception {
+        VatNumberResponse body = new VatNumberResponse();
+        body.setValid(true);
+        ResponseEntity<VatNumberResponse> response = new ResponseEntity<>(body, HttpStatus.OK);
+        when(restTemplate.getForEntity(ArgumentMatchers.any(URI.class), ArgumentMatchers.eq(VatNumberResponse.class)))
+                .thenReturn(response);
+
+        Product product = new Product("1", 1);
+        Basket basket = new Basket("1", PENDING, Sets.newHashSet(Lists.newArrayList(product)));
+
+        mongoOps.insert(basket);
+
+        MvcResult result = mockMvc.perform(post("/basket/{id}/order?vatNumber={vat}",
+                basket.getId(), "12345"))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        Basket resultBasket = objectMapper.readValue(result.getResponse().getContentAsString(), Basket.class);
+        assertThat(resultBasket.getId(), is(basket.getId()));
+
+        Basket persistentBasket = mongoOps.findById(basket.getId(), Basket.class);
+        assertThat(persistentBasket.getStatus(), is(ORDERED));
+        assertThat(persistentBasket.getLastModifiedDate(), greaterThan(basket.getLastModifiedDate()));
+    }
+
+    @Test
     public void shouldReturn404ForNonExistentBasket() throws Exception {
+        VatNumberResponse body = new VatNumberResponse();
+        body.setValid(true);
+        ResponseEntity<VatNumberResponse> response = new ResponseEntity<>(body, HttpStatus.OK);
+        when(restTemplate.getForEntity(ArgumentMatchers.any(URI.class), ArgumentMatchers.eq(VatNumberResponse.class)))
+                .thenReturn(response);
+
         // get basket
         mockMvc.perform(get("/basket/{id}", "i-am-not-in-the-db"))
                 .andExpect(status().isNotFound());
@@ -189,6 +250,10 @@ public class BasketControllerIntegrationTest {
 
         // delete basket
         mockMvc.perform(delete("/basket/{id}", "i-am-not-in-the-db"))
+                .andExpect(status().isNotFound());
+
+        // order basket
+        mockMvc.perform(post("/basket/{id}/order?vatNumber={vat}", "i-am-not-in-the-db", "12345"))
                 .andExpect(status().isNotFound());
     }
 

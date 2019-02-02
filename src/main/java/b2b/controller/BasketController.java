@@ -4,6 +4,7 @@ import b2b.model.Basket;
 import b2b.model.Product;
 import b2b.service.BasketService;
 import b2b.service.ProductValidator;
+import b2b.service.VatNumberValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,11 +18,14 @@ public class BasketController {
 
     private final BasketService basketService;
     private final ProductValidator productValidator;
+    private final VatNumberValidator vatNumberValidator;
 
     @Autowired
-    public BasketController(BasketService basketService, ProductValidator productValidator) {
+    public BasketController(BasketService basketService, ProductValidator productValidator,
+                            VatNumberValidator vatNumberValidator) {
         this.basketService = basketService;
         this.productValidator = productValidator;
+        this.vatNumberValidator = vatNumberValidator;
     }
 
     @RequestMapping(method = RequestMethod.POST)
@@ -45,7 +49,15 @@ public class BasketController {
 
     @RequestMapping(path = "/{id}", method = RequestMethod.DELETE)
     public Basket deleteBasket(@PathVariable String id) {
+        LOG.info("Received basket deletion request for id {}", id);
         return basketService.deleteBasket(id);
+    }
+
+    @RequestMapping(path = "/{id}/order", method = RequestMethod.POST)
+    public Basket orderBasket(@PathVariable String id, @RequestParam String vatNumber) {
+        LOG.info("Received basket order request for id {}, vatNumber {}", id, vatNumber);
+        vatNumberValidator.validate(vatNumber);
+        return basketService.orderBasket(id);
     }
 
 }

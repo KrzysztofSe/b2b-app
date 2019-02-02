@@ -16,4 +16,6 @@ public interface CustomBasketRepository {
     Optional<Basket> updateProduct(String basketId, Product product);
 
     Optional<Basket> setStatus(String basketId, BasketStatus status);
+
+    Optional<Basket> setStatusForBasketWithProducts(String basketId, BasketStatus status);
 }

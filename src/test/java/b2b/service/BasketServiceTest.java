@@ -1,6 +1,7 @@
 package b2b.service;
 
 import b2b.exception.BasketNotFoundException;
+import b2b.exception.InvalidBasketException;
 import b2b.model.Basket;
 import b2b.model.BasketStatus;
 import b2b.model.Product;
@@ -18,6 +19,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import java.util.Optional;
 
 import static b2b.model.BasketStatus.DELETED;
+import static b2b.model.BasketStatus.ORDERED;
 import static b2b.model.BasketStatus.PENDING;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -182,6 +184,52 @@ public class BasketServiceTest {
         basketService.deleteBasket(basketId);
 
         verify(basketRepository, times(1)).setStatus(basketId, DELETED);
+        verifyNoMoreInteractions(basketRepository);
+    }
+
+    @Test
+    public void shouldOrderBasket() {
+        Basket expectedBasket = new Basket("1", PENDING, Sets.newHashSet());
+
+        when(basketRepository.setStatusForBasketWithProducts(expectedBasket.getId(), ORDERED))
+                .thenReturn(Optional.of(expectedBasket));
+
+        Basket result = basketService.orderBasket(expectedBasket.getId());
+
+        assertThat(result, is(expectedBasket));
+
+        verify(basketRepository, times(1)).setStatusForBasketWithProducts(expectedBasket.getId(), ORDERED);
+        verifyNoMoreInteractions(basketRepository);
+    }
+
+    @Test
+    public void shouldThrowExceptionWhenTryingToOrderNonExistentBasket() {
+        String basketId = "1";
+
+        when(basketRepository.setStatusForBasketWithProducts(basketId, ORDERED)).thenReturn(Optional.empty());
+        when(basketRepository.findByIdAndStatus(basketId, PENDING)).thenReturn(Optional.empty());
+
+        expectedException.expect(BasketNotFoundException.class);
+        expectedException.expectMessage("No active basket found with id " + basketId);
+        basketService.orderBasket(basketId);
+
+        verify(basketRepository, times(1)).setStatusForBasketWithProducts(basketId, DELETED);
+        verifyNoMoreInteractions(basketRepository);
+    }
+
+    @Test
+    public void shouldThrowExceptionWhenTryingToOrderBasketWithoutProducts() {
+        Basket expectedBasket = new Basket("1", PENDING, Sets.newHashSet());
+
+        when(basketRepository.setStatusForBasketWithProducts(expectedBasket.getId(), ORDERED)).thenReturn(Optional.empty());
+        when(basketRepository.findByIdAndStatus(expectedBasket.getId(), PENDING)).thenReturn(Optional.of(expectedBasket));
+
+        expectedException.expect(InvalidBasketException.class);
+        expectedException.expectMessage("Basket with id " + expectedBasket.getId() + " has no products");
+        basketService.orderBasket(expectedBasket.getId());
+
+        verify(basketRepository, times(1)).setStatusForBasketWithProducts(expectedBasket.getId(), ORDERED);
+        verify(basketRepository, times(1)).findByIdAndStatus(expectedBasket.getId(), ORDERED);
         verifyNoMoreInteractions(basketRepository);
     }
 
