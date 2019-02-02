@@ -24,7 +24,7 @@ public class BasketController {
     @RequestMapping(method = RequestMethod.POST)
     public String createBasket() {
         LOG.info("Received basket creation request");
-        return  basketService.createBasket().getId();
+        return basketService.createBasket().getId();
     }
 
 }
