@@ -33,7 +33,10 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@SpringBootTest(properties = {"spring.data.mongodb.port=0"})
+@SpringBootTest(properties = {
+        "spring.data.mongodb.port=0",
+        "spring.data.mongodb.host=localhost"
+})
 @AutoConfigureMockMvc
 @RunWith(SpringRunner.class)
 public class BasketControllerIntegrationTest {
