@@ -15,13 +15,13 @@ import static org.springframework.util.StringUtils.isEmpty;
 @EnableScheduling
 public class ApplicationConfig {
 
-    private final String mongoHost;
+    /*private final String mongoHost;
     private final int mongoPort;
     private final String mongoUser;
     private final String mongoPassword;
-    private final String mongoDatabase;
+    private final String mongoDatabase;*/
 
-    public ApplicationConfig(@Value("${mongo.host}") String mongoHost, @Value("${mongo.port}") String mongoPort,
+    /*public ApplicationConfig(@Value("${mongo.host}") String mongoHost, @Value("${mongo.port}") String mongoPort,
                              @Value("${mongo.user}") String mongoUser, @Value("${mongo.password}") String mongoPassword,
                              @Value("${spring.data.mongodb.database}") String mongoDatabase) {
         this.mongoHost = mongoHost;
@@ -29,14 +29,14 @@ public class ApplicationConfig {
         this.mongoUser = mongoUser;
         this.mongoPassword = mongoPassword;
         this.mongoDatabase = mongoDatabase;
-    }
+    }*/
 
     @Bean
     public RestTemplate restTemplate(RestTemplateBuilder builder) {
         return builder.build();
     }
 
-    @Bean
+    /*@Bean
     public MongoClientFactoryBean mongo() {
         MongoClientFactoryBean mongo = new MongoClientFactoryBean();
         mongo.setHost(mongoHost);
@@ -48,5 +48,5 @@ public class ApplicationConfig {
         }
 
         return mongo;
-    }
+    }*/
 }

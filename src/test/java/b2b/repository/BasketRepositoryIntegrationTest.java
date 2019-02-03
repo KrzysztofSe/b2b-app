@@ -20,7 +20,7 @@ import static b2b.model.BasketStatus.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
-@DataMongoTest
+@DataMongoTest(properties = {"spring.data.mongodb.port=0"})
 @RunWith(SpringRunner.class)
 public class BasketRepositoryIntegrationTest {
 
