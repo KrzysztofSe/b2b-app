@@ -8,7 +8,7 @@ For prod configuration you will need to have docker installed. You can run the p
 
 ##### Pull from Docker Hub
 
-1. download the [docker-compose-standalone.yaml](https://github.com/KrzysztofSe/b2b-app/master/docker-compose-standalone.yaml) to your host
+1. download the [docker-compose-standalone.yaml](https://github.com/KrzysztofSe/b2b-app/blob/master/docker-compose-standalone.yaml) to your host
 2. run <code>docker-compose -f docker-compose-standalone.yaml up</code>
 
 ##### Build from code
