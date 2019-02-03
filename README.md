@@ -18,7 +18,8 @@ For prod configuration you will need to have docker installed. You can run the p
 2. run <code>mvn clean install</code>
 3. run <code>docker-compose up</code>
 
-Additionally you can scale the app instances by specifying <code>--scale app={count}</code> attribute.
+Additionally you can scale the app instances by specifying <code>--scale app={count}</code> attribute when running 
+docker-compose, since app instances are configured behind haproxy loadbalancer.
     
 ### Local
 
