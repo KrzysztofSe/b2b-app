@@ -1,21 +1,22 @@
 version: "3"
 services:
   db:
+    container_name: dbhost
     build:
       context: ./mongo
       dockerfile: ./Dockerfile
     networks:
-      no-internet:
-        ipv4_address: 172.18.0.10
+      - no-internet
   app:
+    container_name: apphost
+    depends_on:
+      - db
     build:
       context: .
       dockerfile: ./Dockerfile
     networks:
-      no-internet:
-        ipv4_address: 172.18.0.11
-      internet:
-        ipv4_address: 172.19.0.11
+      - no-internet
+      - internet
     ports:
       - "8080:8080"
 
@@ -23,13 +24,5 @@ networks:
   no-internet:
     driver: bridge
     internal: true
-    ipam:
-      driver: default
-      config:
-        - subnet: 172.18.0.0/16
   internet:
     driver: bridge
-    ipam:
-      driver: default
-      config:
-        - subnet: 172.19.0.0/16
