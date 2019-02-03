@@ -17,6 +17,8 @@ For prod configuration you will need to have docker installed. You can run the p
 1. clone this repository <code>git clone https://github.com/KrzysztofSe/b2b-app.git</code>
 2. run <code>mvn clean install</code>
 3. run <code>docker-compose up</code>
+
+Additionally you can scale the app instances by specifying <code>--scale app={count}</code> attribute.
     
 ### Local
 
