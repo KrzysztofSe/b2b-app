@@ -1,28 +1,44 @@
 version: "3"
+
 services:
+  lb:
+    image: dockercloud/haproxy
+    depends_on:
+      - db
+    links:
+      - app
+    ports:
+      - '8080:80'
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - basket_network
+
   db:
     container_name: dbhost
     build:
       context: ./mongo
       dockerfile: ./Dockerfile
+    ports:
+      - '27017'
     networks:
-      - no-internet
+      - basket_network
+
   app:
-    container_name: apphost
-    depends_on:
-      - db
     build:
       context: .
       dockerfile: ./Dockerfile
     networks:
-      - no-internet
-      - internet
+      - basket_network
     ports:
-      - "8080:8080"
+      - '8080'
+    depends_on:
+      - db
 
 networks:
-  no-internet:
+  basket_network:
     driver: bridge
-    internal: true
-  internet:
-    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.18.0.0/16
