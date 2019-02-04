@@ -6,12 +6,12 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 @ResponseStatus(code = HttpStatus.INTERNAL_SERVER_ERROR)
 public class VatNumberValidatorException extends CustomRestException {
 
-    public VatNumberValidatorException(String message) {
+    public VatNumberValidatorException(final String message) {
         super(message);
     }
 
-    public VatNumberValidatorException(String message, Throwable cause) {
+    public VatNumberValidatorException(final String message,
+                                       final Throwable cause) {
         super(message, cause);
     }
-
 }

@@ -21,8 +21,8 @@ public class ExpirationService {
     private final BasketRepository basketRepository;
 
     @Autowired
-    public ExpirationService(@Value("${basket.expiration.older.than.minutes:30}") int thresholdMinutes,
-                             BasketRepository basketRepository) {
+    public ExpirationService(final @Value("${basket.expiration.older.than.minutes:30}") int thresholdMinutes,
+                             final BasketRepository basketRepository) {
         this.thresholdMinutes = thresholdMinutes;
         this.basketRepository = basketRepository;
     }
@@ -34,5 +34,4 @@ public class ExpirationService {
         long count = basketRepository.setStatusForOlderThan(threshold, EXPIRED);
         LOG.info("Expired baskets count: {}", count);
     }
-
 }
