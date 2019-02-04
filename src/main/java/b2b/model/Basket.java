@@ -23,9 +23,12 @@ public class Basket {
 
     private Set<Product> products = new HashSet<>();
 
-    public Basket() {}
+    public Basket() {
+    }
 
-    public Basket(String id, BasketStatus status, Set<Product> products) {
+    public Basket(final String id,
+                  final BasketStatus status,
+                  final Set<Product> products) {
         this.id = id;
         this.status = status;
         this.products = products;
@@ -35,7 +38,7 @@ public class Basket {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(final String id) {
         this.id = id;
     }
 
@@ -43,7 +46,7 @@ public class Basket {
         return status;
     }
 
-    public void setStatus(BasketStatus status) {
+    public void setStatus(final BasketStatus status) {
         this.status = status;
     }
 
@@ -51,7 +54,7 @@ public class Basket {
         return lastModifiedDate;
     }
 
-    public void setLastModifiedDate(LocalDateTime lastModifiedDate) {
+    public void setLastModifiedDate(final LocalDateTime lastModifiedDate) {
         this.lastModifiedDate = lastModifiedDate;
     }
 
@@ -59,12 +62,12 @@ public class Basket {
         return products;
     }
 
-    public void setProducts(Set<Product> products) {
+    public void setProducts(final Set<Product> products) {
         this.products = products;
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(final Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Basket basket = (Basket) o;
@@ -85,5 +88,4 @@ public class Basket {
                 ", products=" + products +
                 '}';
     }
-
 }

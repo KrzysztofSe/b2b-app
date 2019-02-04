@@ -13,9 +13,11 @@ public class Product {
 
     private Integer quantity;
 
-    public Product() {}
+    public Product() {
+    }
 
-    public Product(String id, Integer quantity) {
+    public Product(final String id,
+                   final Integer quantity) {
         this.id = id;
         this.quantity = quantity;
     }
@@ -24,7 +26,7 @@ public class Product {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(final String id) {
         this.id = id;
     }
 
@@ -32,12 +34,12 @@ public class Product {
         return quantity;
     }
 
-    public void setQuantity(Integer quantity) {
+    public void setQuantity(final Integer quantity) {
         this.quantity = quantity;
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(final Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Product product = (Product) o;
@@ -56,5 +58,4 @@ public class Product {
                 ", quantity=" + quantity +
                 '}';
     }
-
 }

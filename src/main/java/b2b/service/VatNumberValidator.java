@@ -21,10 +21,10 @@ public class VatNumberValidator {
 
     private static final Logger LOG = LoggerFactory.getLogger(VatNumberValidator.class);
 
-    private final static String ACCESS_KEY = "access_key";
-    private final static String VAT_NUMBER_KEY = "vat_number";
-    private final static String FORMAT_KEY = "format";
-    private final static String FORMAT_VALUE = "1";
+    private static final String ACCESS_KEY = "access_key";
+    private static final String VAT_NUMBER_KEY = "vat_number";
+    private static final String FORMAT_KEY = "format";
+    private static final String FORMAT_VALUE = "1";
 
     private final String token;
     private final String validatorUrl;
@@ -32,14 +32,15 @@ public class VatNumberValidator {
     private final RestTemplate restTemplate;
 
     @Autowired
-    public VatNumberValidator(RestTemplate restTemplate, @Value("${vat.validator.token}") String token,
-                              @Value("${vat.validator.url}") String validatorUrl) {
+    public VatNumberValidator(final RestTemplate restTemplate,
+                              final @Value("${vat.validator.token}") String token,
+                              final @Value("${vat.validator.url}") String validatorUrl) {
         this.restTemplate = restTemplate;
         this.token = token;
         this.validatorUrl = validatorUrl;
     }
 
-    public void validate(String vatNumber) {
+    public void validate(final String vatNumber) {
         LOG.info("Validating vat number {}", vatNumber);
         URI uri = UriComponentsBuilder.fromHttpUrl(validatorUrl)
                 .queryParam(ACCESS_KEY, token)
@@ -54,7 +55,8 @@ public class VatNumberValidator {
         }
     }
 
-    private void validateResponse(ResponseEntity<VatNumberResponse> response, String vatNumber) {
+    private void validateResponse(final ResponseEntity<VatNumberResponse> response,
+                                  final String vatNumber) {
         if (!response.getStatusCode().equals(HttpStatus.OK)) {
             throw new VatNumberValidatorException("Could not retrieve VAT number validation response");
         }

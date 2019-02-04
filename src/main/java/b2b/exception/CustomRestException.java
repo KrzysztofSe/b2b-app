@@ -7,12 +7,13 @@ public class CustomRestException extends RuntimeException {
 
     private static final Logger LOG = LoggerFactory.getLogger(CustomRestException.class);
 
-    public CustomRestException(String message) {
+    public CustomRestException(final String message) {
         super(message);
         LOG.warn(message);
     }
 
-    public CustomRestException(String message, Throwable cause) {
+    public CustomRestException(final String message,
+                               final Throwable cause) {
         super(message, cause);
         LOG.warn(message);
     }

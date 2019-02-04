@@ -61,7 +61,7 @@ public class BasketControllerIntegrationTest {
     @Test
     public void shouldCreateNewBasket() throws Exception {
         MvcResult result = mockMvc.perform(post("/basket"))
-                .andExpect(status().isOk())
+                .andExpect(status().isCreated())
                 .andReturn();
 
         String resultId = result.getResponse().getContentAsString();

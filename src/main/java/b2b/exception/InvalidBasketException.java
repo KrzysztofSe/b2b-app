@@ -6,8 +6,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 @ResponseStatus(code = HttpStatus.BAD_REQUEST)
 public class InvalidBasketException extends CustomRestException {
 
-    public InvalidBasketException(String message) {
+    public InvalidBasketException(final String message) {
         super(message);
     }
-
 }

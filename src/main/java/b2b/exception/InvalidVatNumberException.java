@@ -6,8 +6,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 @ResponseStatus(code = HttpStatus.PRECONDITION_FAILED)
 public class InvalidVatNumberException extends CustomRestException {
 
-    public InvalidVatNumberException(String message) {
+    public InvalidVatNumberException(final String message) {
         super(message);
     }
-
 }

@@ -7,7 +7,8 @@ public class VatNumberResponse {
 
     private boolean valid;
 
-    public VatNumberResponse() {}
+    public VatNumberResponse() {
+    }
 
     public boolean isValid() {
         return valid;
@@ -16,5 +17,4 @@ public class VatNumberResponse {
     public void setValid(boolean valid) {
         this.valid = valid;
     }
-
 }
